@@ -1,8 +1,8 @@
 import React from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { getAuth, signInWithPopup, signOut } from "firebase/auth";
-import { provider } from "../firebase-config";
+import { signInWithPopup, signOut } from "firebase/auth";
+import { auth, provider } from "../firebase-config";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectUserName,
@@ -10,6 +10,7 @@ import {
   setSignOutState,
   setUserLoginDetails,
 } from "../features/user/userSlice";
+import { Link } from "react-router-dom";
 import { useEffect } from "react";
 
 const navLinks = [
@@ -46,21 +47,10 @@ const navLinks = [
 ];
 
 const Header = () => {
-  const auth = getAuth();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const userName = useSelector(selectUserName);
   const userPhoto = useSelector(selectUserPhoto);
-
-  useEffect(() => {
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        setUser(user);
-        navigate("/home");
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userName]);
 
   const setUser = (user) => {
     dispatch(
@@ -71,6 +61,16 @@ const Header = () => {
       })
     );
   };
+
+  useEffect(() => {
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        setUser(user);
+        navigate("/home");
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userName]);
 
   const handleAuth = () => {
     if (!userName) {
@@ -95,9 +95,11 @@ const Header = () => {
   return (
     <>
       <Nav>
-        <Logo>
-          <img src="/images/logo.svg" alt="" />
-        </Logo>
+        <Link to="/home">
+          <Logo>
+            <img src="/images/logo.svg" alt="" />
+          </Logo>
+        </Link>
         {!userName ? (
           <Login onClick={handleAuth}>Login</Login>
         ) : (
